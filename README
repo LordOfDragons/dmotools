@@ -1,0 +1,86 @@
+﻿/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
+|*)          DMO Tools - 1.0 by Dragonlord         (*|
+|*)                  roland@rptd.ch                (*|
+\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/
+~~~~~~~~~ __/v \/v v\___/v VVv V\_____/Vv\__ ~~~~~~~~~
+ ~~~~  __/v           V           VvV       V\__  ~~~~ 
+ \  \_/Vv     ____     _       _     ____      V\_/  /
+  |@|          )  \_    \ _|_ /    _/  (          |@|
+  \  \        )_____\_ `>¬.=.¬<´ _/_____(        /  /
+  |**|         )_   / \_/\o=o/\_/ \   _(         |**|
+ / /\ \          )_/__/ \ VvV / \__\_(          / /\ \
+_VV__VV____________VVVv___~*~___vVVV____________VV__VV_
+                      ~@œ¢#8#¢œ@~
+                       ~~~*#*~~~
+                          ~~~
+
+
+DMO Tools is a little tool for handling the data archives in the
+Digimon Master Online MMO game. Each archive consists of a file
+map (*.hf) and a data file (*.pf). This tool can read and update
+such files. It is a command line only tool so you can use it in
+batch files of any kind of call it from inside other programs.
+
+Important to note is that the files in the archives are identified
+using a 32-bit number. There are no file names or file path stored
+inside the archives. To deal with a file of choice you have to use
+the matching file ID. You can find them in tables on the forum.
+
+
+
+dmotools.exe <action> <params>
+   Shows a help output with all possible actions
+
+dmotools.exe filemap <filename.hf>
+dmotools.exe filemapCSV <filename.hf>
+   Prints the content of the file map <filename.hf> on the console. The CSV version of
+   the command outputs the content in CSV format so you can load it with OpenOffice or
+   other CSV aware applications.
+
+dmotools.exe extractFile <filename.hf> <filename.pf> <fileID> <destFile>
+   Extracts the file with the ID <fileID> from the archive <filename.hf/pf> and stores
+   the content in the file <destFile>.
+
+dmotools.exe extractAllFiles <filename.hf> <filename.pf> <destDir>
+   Extracts all files from the archive <filename.hf/pf> into files with the automatic
+   naming "file_<ID>.dat" (with ID matching the file ID) into <destDir>.
+
+dmotools.exe diffFileMap <filemap1.hf> <filemap2.hf>
+   Shows differences between the archive <filemap2.hf> compared against <filemap1.hf>.
+   The output is given in CSV format with the first column stating if the file has
+   been added (exists in filemap2 but not filemap1), changed (exists in both but the
+   size changed) or has been removed (exists in filemap1 but no more in filemap2).
+
+dmotools.exe extractDiff <filemap1.hf> <filemap2.hf> <filemap2.pf> <destDir>
+   Extract differences between the archive <filemap2.hf> compared against <filemap1.hf>
+   into files with the automatic naming "<change>_<ID>.dat" into destDir. "change" is
+   "changed", "added" or "removed" similar to "diffFileMap". This is a fast way to see
+   changes from one archive to the other examining the new files for their content.
+
+dmotools.exe compactArchive <filemap.hf> <archive.pf> <destFilemap.hf> <destArchive.pf>
+   Creates a copy of the archive <filemap.hf/archive.pf> by copying file data but removing
+   unneeded padding. The new archive is written into <destFilemap.hf/destArchive.pf>.
+   Entries in the data file have a constant padding added to them but some entries have
+   more padding than required. This removes the unneeded padding reducing the file size.
+
+dmotools.exe updateArchive <filemap.hf> <archive.pf> <fileID1> <pathFileData1> ...
+   Updates files inside the archive <filemap.hf/archive.pf>. More than one file can be
+   updated inside an archive by specificing more than on pair of fileID/pathFileData.
+   The archive is first updated into temporary files then written back to the original
+   archive files (YES, THIS MODIFIES THE ARCHIVE IN-PLACE!). Missing files are ignored
+   silently. The temp files are used instead of reading the entire archive into memory
+   because archives can be quite large (>150MB) to be friendly to less strong systems.
+
+
+
+Legal Disclaimer //
+//////////////////
+
+This application is provided only as a tool to read and update content with archive files
+of the Digimon Master Online MMO game. This is the one and only intended purpose. The
+author can not be held responsible for misusing or incorrectly using the application for
+any other purpose. The use of this application happens on your own risk. The author can
+not be held responsible for any potential damage caused due to the usage of this software.
+
+This application is distribute under the terms of the GNU General Public License v2 or
+later (at your option).

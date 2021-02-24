@@ -1,0 +1,76 @@
+from SConsCommon import *
+
+# import whatever is given by the parent builder
+Import( 'parent_env parent_targets parent_report' )
+
+# OS detection
+OSPosix = ( os.name == 'posix' )
+OSWindows = ( os.name == 'win32' or sys.platform == 'win32' )
+
+# setup the environment matching the OS
+envApp = parent_env.Clone()
+
+libs = []
+
+# do configure stuff
+conf = envApp.Configure()
+
+if OSWindows:
+	libs.append( [ 'kernel32', 'user32' ] )
+
+conf.Finish()
+
+# write the configuration file required by a few source files
+configFilePath = '%s/dmotconfig.h' % str( Dir( '.' ).srcnode() )
+configFileDefines = {}
+configFileDefines[ 'OS_UNIX' ] = OSPosix
+configFileDefines[ 'OS_W32' ] = OSWindows
+
+if WriteConfigFile( configFilePath, configFileDefines, envApp ):
+	Exit( 'Writing configuration file failed' )
+
+# fetch values in expanded form for later use
+pathSConscript = str( Dir( "." ).srcnode() )
+
+pathBin = envApp.subst( envApp[ 'path_bin' ] )
+
+# update the compile flags
+if 'CXXFLAGS' in os.environ:
+	envApp.Append( CXXFLAGS = os.environ[ 'CXXFLAGS' ] )
+envApp.Append( CXXFLAGS = '-O2' )
+envApp.Append( CXXFLAGS = '-Wall' )
+if envApp[ 'with_warnerrors' ]:
+	envApp.Append( CXXFLAGS = '-Werror' )
+
+if 'LDFLAGS' in os.environ:
+	envApp.Append( LINKFLAGS = os.environ[ 'LDFLAGS' ] )
+
+# create environment for the progam
+envApp.Append( CXXFLAGS = '-I%s/src' % pathSConscript )
+
+# determine the source files
+sources = []
+
+oldcwd = os.getcwd()
+os.chdir( str( Dir(".").srcnode() ) )
+for root, dirs, files in os.walk( '.' ):
+	if '.svn' in dirs:
+		dirs.remove( '.svn' )
+	for s in fnmatch.filter( files, '*.cpp' ):
+		sources.append( root + os.sep + s )
+os.chdir( oldcwd )
+
+# setup the builders
+objects = []
+for s in sources:
+	objects.append( envApp.StaticObject( s ) )
+
+program = envApp.Program( target='dmotools', source=objects, LIBS=libs )
+targetBuild = envApp.Alias( 'dmotools_buildonly', program )
+
+install = []
+install.append( envApp.Install( pathBin, program ) )
+targetInstall = envApp.Alias( 'dmotools', install )
+
+# add the targets to the targets list
+parent_targets[ 'dmotools' ] = [ 'DMO Tools', targetInstall ]
